@@ -82,6 +82,7 @@ class WebScrapper:
         lista_texto = []
         for li in elementos_li:
             texto = li.text
+            print(texto)
             lista_texto.append(texto)
             if texto.__contains__("Director"):
                 index_director = i
@@ -130,9 +131,11 @@ class WebScrapper:
             archivo = open("info.txt", "a")
             archivo.write(f"{nombre}-?{director_str};{guionista_str};{actor_str}\n")
 
-
+"""
 ws = WebScrapper()
 lista_movies = ws.obtener_movies_urls()
+print(lista_movies[0].nombre)
+ws.escribir_movie_info_diccionario(lista_movies[0])
 for movie in lista_movies:
-    ws.escribir_movie_info_diccionario(movie)
-ws.escribir_en_txt()
+    ws.escribir_movie_info_diccionario(movie)"""
+#ws.escribir_en_txt()
