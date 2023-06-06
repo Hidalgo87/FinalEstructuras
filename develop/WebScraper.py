@@ -10,6 +10,9 @@ class Movie:
         self.nombre = nombre
         self.url = url
 
+    def __str__(self):
+        return self.nombre
+
 
 class WebScrapper:
     def __init__(self):
@@ -82,7 +85,6 @@ class WebScrapper:
         lista_texto = []
         for li in elementos_li:
             texto = li.text
-            print(texto)
             lista_texto.append(texto)
             if texto.__contains__("Director"):
                 index_director = i
@@ -102,7 +104,7 @@ class WebScrapper:
         # info = [ Directores: list, Guonistas: list, Actors: list ]
         info = [directores, guionistas, actores]
         self.diccionario[nombre] = info
-        print(f"Pelicula: {nombre}")
+        print(f"Pelicula : {nombre}")
         print(f"Director: {directores}")
         print(f"Guionistas: {guionistas}")
         print(f"Actores: {actores}")
@@ -128,14 +130,15 @@ class WebScrapper:
             guionista_str = guionista_str[1:]
             actor_str = actor_str[1:]
 
-            archivo = open("info.txt", "a")
+            archivo = open("info.txt", "a", encoding='utf-8')
             archivo.write(f"{nombre}-?{director_str};{guionista_str};{actor_str}\n")
 
-"""
+
 ws = WebScrapper()
 lista_movies = ws.obtener_movies_urls()
-print(lista_movies[0].nombre)
-ws.escribir_movie_info_diccionario(lista_movies[0])
+i = 0
 for movie in lista_movies:
-    ws.escribir_movie_info_diccionario(movie)"""
-#ws.escribir_en_txt()
+    print(i)
+    i += 1
+    ws.escribir_movie_info_diccionario(movie)
+ws.escribir_en_txt()

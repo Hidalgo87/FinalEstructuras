@@ -5,6 +5,10 @@ from develop.Lector import Lector
 
 
 class Programa:
+
+    def __init__(self):
+        self.grafo = None
+
     def actualizarGrafo_ConTxt_EnSerializado(self):
         l = Lector()
         peliculas, diccionario = l.obtener_peliculasYdiccionario()
@@ -43,7 +47,7 @@ class Programa:
         with open("objeto_serializado.pickle", "wb") as archivo:
             archivo.write(objeto_serializado)
 
-    def crearGrafo_ConSerializado(self):
+    def crearGrafo_ConSerializado(self) -> Grafo:
         with open("objeto_serializado.pickle", "rb") as archivo:
             obj = archivo.read()
             objeto_deserializado = pickle.loads(obj)
@@ -58,5 +62,71 @@ class Programa:
         rafo.visitados = objeto_deserializado.visitados
 
         lista = [pelicula for pelicula in peliculas if pelicula in rafo.listaNombres]
-        print(f"Peliculas: {len(lista)}")
         return rafo
+
+    def solicitar_entero(self) -> int:
+        try:
+            num = int(input("Ingresa un número: "))
+            return num
+        except Exception:
+            self.solicitar_entero()
+
+    def mostrar_menu(self):
+        print("------------------------------------- MENÚ -------------------------------------")
+        print("1. Buscar una persona o película por un fragmento de su nombre")
+        print("2. Conocer el tipo de una persona: actriz, director o escritor")
+        print("3. Conocer la relación entre dos nodos")
+        print("4. Conocer el actor que ha actuado en más películas")
+        print("5. Conocer el director que más películas ha dirigido")
+        print("6. Conocer todas las películas, y su rol, en las que ha trabajado una persona")
+
+    def solicitar_persona_o_pelicula(self):
+        posible_item = input("Ingrese el nombre exacto de la persona: ")
+        if posible_item in self.grafo.listaNombres:
+            return posible_item
+        else:
+            print("La persona o película ingresada no se encuentra en el grafo")
+            return self.solicitar_persona_o_pelicula()
+
+    def ejecutar_metodos(self, opcion):
+        if opcion == 1:
+            item = input("Ingrese un fragmento del nombre que busca: ")
+            ListaEncontrados = self.grafo.buscar_coincidencias(item)
+            if len(ListaEncontrados) > 0:
+                for nombre in ListaEncontrados:
+                    print(f"{nombre}")
+            else:
+                print(f"No se encontraron coincidencias")
+        elif opcion == 2:
+            persona = self.solicitar_persona_o_pelicula()
+            texto_resultado = self.grafo.tipo_persona(persona)
+            print(texto_resultado)
+        elif opcion == 3:
+            self.grafo.Camino = []
+            self.grafo.visitados = []
+            print("Ingresa el nombre del nodo origen")
+            n1 = self.solicitar_persona_o_pelicula()
+            print("Ingresa el nombre del nodo destino")
+            n2 = self.solicitar_persona_o_pelicula()
+            resultado = self.grafo.encontrar_camino(n1, n2)
+            print(resultado)
+        elif opcion == 4:
+            response = self.grafo.personaje_mas_recurrente(1)
+            print(response)
+        elif opcion == 5:
+            response = self.grafo.personaje_mas_recurrente(4)
+            print(response)
+        elif opcion == 6:
+            persona = self.solicitar_persona_o_pelicula()
+            response = self.grafo.encontrar_peliculasYrelacion(persona)
+            print(response)
+        else:
+            print("Intenta otra vez")
+
+    def Run(self):
+        self.grafo = self.crearGrafo_ConSerializado()
+        print(self.grafo.encontrar_camino("Sergio Leone", "Leonardo DiCaprio"))
+        while True:
+            self.mostrar_menu()
+            opcion = self.solicitar_entero()
+            self.ejecutar_metodos(opcion)

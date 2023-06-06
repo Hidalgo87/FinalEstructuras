@@ -4,7 +4,7 @@ from io import BufferedReader
 class Lector:
     def obtener_peliculasYdiccionario(self):
         diccionario = {}
-        archivo = open("develop/info.txt", "r")
+        archivo = open("develop/info.txt", "r", encoding='utf-8')
         contenido = archivo.readlines()
         archivo.close()
         peliculas = []
