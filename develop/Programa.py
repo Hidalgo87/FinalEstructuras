@@ -14,6 +14,7 @@ class Programa:
         peliculas, diccionario = l.obtener_peliculasYdiccionario()
         g = Grafo(1)
         g.matriz_adyacencia = [[[0]]]
+        g.peliculas = peliculas
         nombre_pelicula = peliculas[0]
         g.listaNombres = [nombre_pelicula]
         info = diccionario[nombre_pelicula]
@@ -40,7 +41,6 @@ class Programa:
                 g.agregar_nodo(nombre_pelicula, guionista, 0, 3)
             for actor in actores:
                 g.agregar_nodo(nombre_pelicula, actor, 2, 1)
-        g.visualizar_grafo_libreria()
         print(len(g.listaNombres))
         objeto_serializado = pickle.dumps(g)
 
@@ -60,6 +60,7 @@ class Programa:
         rafo.matriz_adyacencia = objeto_deserializado.matriz_adyacencia
         rafo.Camino = objeto_deserializado.Camino
         rafo.visitados = objeto_deserializado.visitados
+        rafo.peliculas = peliculas
 
         lista = [pelicula for pelicula in peliculas if pelicula in rafo.listaNombres]
         return rafo
@@ -109,7 +110,10 @@ class Programa:
             print("Ingresa el nombre del nodo destino")
             n2 = self.solicitar_persona_o_pelicula()
             resultado = self.grafo.encontrar_camino(n1, n2)
-            print(resultado)
+            cadena = ""
+            for palabra in resultado:
+                cadena += palabra
+            print(cadena)
         elif opcion == 4:
             response = self.grafo.personaje_mas_recurrente(1)
             print(response)
@@ -125,7 +129,7 @@ class Programa:
 
     def Run(self):
         self.grafo = self.crearGrafo_ConSerializado()
-        print(self.grafo.encontrar_camino("Sergio Leone", "Leonardo DiCaprio"))
+        #print(self.grafo.encontrar_camino("Reservoir Dogs", "Leonardo DiCaprio"))
         while True:
             self.mostrar_menu()
             opcion = self.solicitar_entero()

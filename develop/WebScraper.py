@@ -81,7 +81,7 @@ class WebScrapper:
         index_director = -1
         index_guionistas = -1
         index_actores = -1
-        i=0
+        i = 0
         lista_texto = []
         for li in elementos_li:
             texto = li.text
@@ -97,18 +97,19 @@ class WebScrapper:
             i += 1
         directores = lista_texto[index_director+1:index_guionistas]
         guionistas = lista_texto[index_guionistas+1:index_actores]
-        actores = lista_texto[index_actores+1:]
-
-
+        # actores = lista_texto[index_actores+1:]
+        nodos_actores = soup.findAll('a', attrs={'data-testid':'title-cast-item__actor'})
+        actores = []
+        for nodo_actor in nodos_actores:
+            actores.append(nodo_actor.text)
 
         # info = [ Directores: list, Guonistas: list, Actors: list ]
         info = [directores, guionistas, actores]
         self.diccionario[nombre] = info
         print(f"Pelicula : {nombre}")
-        print(f"Director: {directores}")
-        print(f"Guionistas: {guionistas}")
+        """print(f"Director: {directores}")
+        print(f"Guionistas: {guionistas}")"""
         print(f"Actores: {actores}")
-
 
     def escribir_en_txt(self):
         nombres = self.diccionario.keys()

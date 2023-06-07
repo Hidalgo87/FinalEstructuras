@@ -11,8 +11,10 @@ class Grafo:
         self.dim = dim
         self.matriz_adyacencia = [[[0]] * dim for _ in range(dim)]
         self.listaNombres = [None for _ in range(dim)]
+
         self.visitados = []
         self.Camino = []
+        self.peliculas = []
 
     def imprimir_matriz(self):
         print(self.listaNombres)
@@ -136,6 +138,8 @@ class Grafo:
     # --------------------------------------------
 
     def tipo_persona(self, NombreBuscar):
+        if NombreBuscar in self.peliculas:
+            return f"{NombreBuscar} es una película."
         try:
             indice = self.listaNombres.index(NombreBuscar)
         except ValueError:
@@ -230,6 +234,8 @@ class Grafo:
         return definitivo
 
     def encontrar_peliculasYrelacion(self, nombre_persona):
+        if nombre_persona in self.peliculas:
+            return f"{nombre_persona} es una película."
         index = self.listaNombres.index(nombre_persona)
         fila_persona = self.matriz_adyacencia[index]
         roles = []
@@ -290,7 +296,42 @@ class Grafo:
                         lista_conexiones.append(self.listaNombres[i])
                 # print(f"conexiones {origen}: {lista_conexiones}")
                 if destino in lista_conexiones:
-                    self.Camino.append(f" {origen} -->  {destino} ")
+                    if origen in self.peliculas:
+                        # si es pelicula
+                        resultado = self.encontrar_peliculasYrelacion(self.Camino[-1].split("'")[1])
+                        peliculas_roles = resultado.split("\n")
+                        roles_definitivos_pasado = ""
+                        for linea in peliculas_roles:
+                            if linea.__contains__(origen):
+                                pelicula_rol = linea.split(":")
+                                roles_definitivos_pasado = pelicula_rol[1]
+                        resultado = self.encontrar_peliculasYrelacion(destino)
+                        peliculas_roles = resultado.split("\n")
+                        roles_definitivos_siguiente = ""
+                        for linea in peliculas_roles:
+                            if linea.__contains__(origen):
+                                pelicula_rol = linea.split(":")
+                                roles_definitivos_siguiente = pelicula_rol[1]
+                        self.Camino.append(f"{roles_definitivos_pasado} en la película '{origen}' donde fue ")
+                        self.Camino.append(f"{roles_definitivos_siguiente}: '{destino}'")
+                    else:
+                        # si es personaje
+                        resultado = self.encontrar_peliculasYrelacion(origen)
+                        peliculas_roles = resultado.split("\n")
+                        roles_definitivos_pasados = ""
+                        roles_definitivos_siguientes = ""
+                        for linea in peliculas_roles:
+                            pelicula_rol = linea.split(":")
+                            cadena = pelicula_rol[0]
+                            roles = pelicula_rol[1]
+                            pelicula_temp = cadena.split(",")
+                            pelicula = pelicula_temp[0].split(" ")[1]
+                            if self.Camino[-1].__contains__(pelicula):
+                                roles_definitivos_pasados = roles
+                            if destino.__contains__(pelicula):
+                                roles_definitivos_siguientes = roles
+                        self.Camino.append(f"{roles_definitivos_pasados}: '{origen}', que fue ")
+                        self.Camino.append(f"{roles_definitivos_siguientes} en la película '{destino}'")
                     return self.Camino
                 else:
                     if lista_conexiones.count == 0:
@@ -301,7 +342,51 @@ class Grafo:
                             if nuevo_origen in self.visitados:
                                 continue
                             else:
-                                self.Camino.append(f" {origen} --> ")
+                                # Este if es sólo para definir la cadena bien como debe ser
+                                if origen in self.peliculas:
+                                    # si es película
+                                    if len(self.Camino) != 0:
+                                        cosa = self.Camino[-1].split("'")[1]
+                                        resultado = self.encontrar_peliculasYrelacion(self.Camino[-1].split("'")[1])
+                                        peliculas_roles = resultado.split("\n")
+                                        roles_definitivos = ""
+                                        for linea in peliculas_roles:
+                                            if linea.__contains__(origen):
+                                                pelicula_rol = linea.split(":")
+                                                for palabra in pelicula_rol:
+                                                    if palabra.__contains__(origen):
+                                                        roles_definitivos = pelicula_rol[-1]
+                                                        # TODO: probar
+                                                        # Raiders of the Lost Ark
+                                                        # 12 Angry Men
+                                                        break
+                                            else:
+                                                pass
+                                        self.Camino.append(f"{roles_definitivos} en la película '{origen}', donde fue ")
+                                    else:
+                                        self.Camino.append(f"la película '{origen}' donde fue ")
+                                else:
+                                    # si es personaje
+                                    if len(self.Camino) == 0:
+                                        self.Camino.append(f"'{origen}' fue ")
+                                    else:
+                                        resultado = self.encontrar_peliculasYrelacion(origen)
+                                        peliculas_roles = resultado.split("\n")
+                                        roles_definitivos_pasados = ""
+                                        for linea in peliculas_roles:
+                                            pelicula_rol = linea.split(":")
+                                            cadena = pelicula_rol[0]
+                                            if len(pelicula_rol) != 2:
+                                                cadena += pelicula_rol[1]
+                                            roles = pelicula_rol[-1]
+                                            pelicula_temp = cadena.split(",")
+                                            pelicula = pelicula_temp[0].replace("En ","")
+                                            if self.Camino[-1].__contains__(pelicula):
+                                                #aca está la vaina
+                                                roles_definitivos_pasados = roles
+                                                break
+                                        self.Camino.append(f"{roles_definitivos_pasados.replace(' ','')}: '{origen}', que fue ")
+                                # Hasta aqui viene el if decorador
                                 cadena = self.encontrar_camino(nuevo_origen, destino)
                                 # print(f"cadena : {cadena}")
                                 if cadena == "ñ" or cadena is None:
