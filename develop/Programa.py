@@ -111,8 +111,11 @@ class Programa:
             n2 = self.solicitar_persona_o_pelicula()
             resultado = self.grafo.encontrar_camino(n1, n2)
             cadena = ""
-            for palabra in resultado:
-                cadena += palabra
+            if resultado is None:
+                cadena = "No se puede relacionar, en ese orden, los dos nodos"
+            else:
+                for palabra in resultado:
+                    cadena += palabra
             print(cadena)
         elif opcion == 4:
             response = self.grafo.personaje_mas_recurrente(1)
